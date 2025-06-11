@@ -3,10 +3,10 @@ create database Library;
 CREATE TABLE users (
     username VARCHAR(50) PRIMARY KEY,
     password VARCHAR(100) NOT NULL,
-    role ENUM('Quản trị viên', 'Người dùng') NOT NULL -- chỉ nhập một trong hai giá trị cố định
+    role ENUM('admin', 'pulic') NOT NULL -- chỉ nhập một trong hai giá trị cố định
 );
 
-insert into users (username, password, role) value ("admin", "123", "Quản trị viên");
+insert into users (username, password, role) value ("admin@", "admin@123", "admin");
 
 CREATE TABLE books (
     id SERIAL PRIMARY KEY,
