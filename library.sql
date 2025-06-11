@@ -6,7 +6,8 @@ CREATE TABLE users (
     role ENUM('admin', 'pulic') NOT NULL -- chỉ nhập một trong hai giá trị cố định
 );
 
-insert into users (username, password, role) value ("admin@", "admin@123", "admin");
+INSERT TO users (username, password, role) 
+VALUE ("admin@", "admin@123", "admin");
 
 CREATE TABLE books (
     id SERIAL PRIMARY KEY,
