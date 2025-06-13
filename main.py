@@ -23,7 +23,7 @@ def login():
         login_window.destroy()
 
         # Dựa vào role để mở giao diện
-        if role == "Quản trị viên":
+        if role == "Admin":
             open_admin_interface()
         else:
             open_user_interface()
@@ -57,7 +57,7 @@ def open_register_window():
             messagebox.showerror("Trùng tên", "Tên đăng nhập đã tồn tại")
             return
 
-        db.execute_query("INSERT INTO users (username, password, role) VALUES (%s, %s, 'Người dùng')",
+        db.execute_query("INSERT INTO users (username, password, role) VALUES (%s, %s, 'Public')",
                        (username, password))
         
         messagebox.showinfo("Thành công", "Đăng ký thành công!")
@@ -66,28 +66,26 @@ def open_register_window():
     tk.Button(reg_win, text="Đăng ký", command=register).pack(pady=10)
 
 # ======= Giao diện Đăng nhập chính =======
-# Cửa sổ chính
-login_window = tk.Tk()
-login_window.title("Đăng nhập hệ thống")
-login_window.geometry("300x220")
-try:
-    login_window.iconbitmap("books_icon.ico")
-except:
-    pass
-
-tk.Label(login_window, text="Tên đăng nhập:").pack()
-entry_user = tk.Entry(login_window)
-entry_user.pack()
-
-tk.Label(login_window, text="Mật khẩu:").pack()
-entry_pass = tk.Entry(login_window, show="*")
-entry_pass.pack()
-
-tk.Button(login_window, text="Đăng nhập", command=login).pack(pady=10)
-tk.Button(login_window, text="Đăng ký tài khoản", command=open_register_window).pack()
-
-login_window.mainloop()
-
 # Chạy chương trình
 if __name__ == "__main__":
-    open_admin_interface()
+    # Cửa sổ chính
+    login_window = tk.Tk()
+    login_window.title("Đăng nhập hệ thống")
+    login_window.geometry("300x220")
+    try:
+        login_window.iconbitmap("books_icon.ico")
+    except:
+        pass
+
+    tk.Label(login_window, text="Tên đăng nhập:").pack()
+    entry_user = tk.Entry(login_window)
+    entry_user.pack()
+
+    tk.Label(login_window, text="Mật khẩu:").pack()
+    entry_pass = tk.Entry(login_window, show="*")
+    entry_pass.pack()
+
+    tk.Button(login_window, text="Đăng nhập", command=login).pack(pady=10)
+    tk.Button(login_window, text="Đăng ký tài khoản", command=open_register_window).pack()
+
+    login_window.mainloop()
