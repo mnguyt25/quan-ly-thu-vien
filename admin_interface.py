@@ -1,5 +1,8 @@
 import tkinter as tk
-from tkinter import messagebox
+#from tkinter import messagebox
+from books import add_book, edit_book, delete_book, find_book, show_book
+from users import add_user, edit_user, delete_user, find_user, show_user
+from borrowings import borrow_book, return_book, show_overdue_books
 
 # ======= Giao diện Quản trị viên =======
 def open_admin_interface():
@@ -31,6 +34,13 @@ def open_admin_interface():
     user_menu.add_command(label="Tìm kiếm thông tin người dùng", command=lambda: find_user())
     user_menu.add_command(label="Hiển thị danh sách người dùng", command=lambda: show_user())
     menubar.add_cascade(label="Quản lý người dùng", menu=user_menu)
+    
+    # Menu mượn trả sách
+    borrow_menu = tk.Menu(menubar, tearoff=0)
+    borrow_menu.add_command(label="Mượn sách", command=borrow_book)
+    borrow_menu.add_command(label="Trả sách", command=return_book)
+    borrow_menu.add_command(label="Sách quá hạn", command=show_overdue_books)
+    menubar.add_cascade(label="Mượn/Trả", menu=borrow_menu)
 
     # Thoát
     menubar.add_command(label="Thoát", command=window.destroy)
@@ -41,35 +51,35 @@ def open_admin_interface():
     
     window.mainloop()
 
-# Demo
-# Chức năng sách
-def add_book():
-    messagebox.showinfo("Quản lý sách", "Chức năng thêm sách")
+# # Demo
+# # Chức năng sách
+# def add_book():
+#     messagebox.showinfo("Quản lý sách", "Chức năng thêm sách")
 
-def edit_book():
-    messagebox.showinfo("Quản lý sách", "Chức năng sửa sách")
+# def edit_book():
+#     messagebox.showinfo("Quản lý sách", "Chức năng sửa sách")
 
-def delete_book():
-    messagebox.showinfo("Quản lý sách", "Chức năng xóa sách")
+# def delete_book():
+#     messagebox.showinfo("Quản lý sách", "Chức năng xóa sách")
 
-def find_book():
-    messagebox.showinfo("Quản lý sách", "Chức năng tìm sách")
+# def find_book():
+#     messagebox.showinfo("Quản lý sách", "Chức năng tìm sách")
 
-def show_book():
-    messagebox.showinfo("Quản lý sách", "Chức năng hiển thị sách")
+# def show_book():
+#     messagebox.showinfo("Quản lý sách", "Chức năng hiển thị sách")
 
-# Chức năng người dùng
-def add_user():
-    messagebox.showinfo("Người dùng", "Thêm người dùng")
+# # Chức năng người dùng
+# def add_user():
+#     messagebox.showinfo("Người dùng", "Thêm người dùng")
 
-def edit_user():
-    messagebox.showinfo("Người dùng", "Sửa thông tin người dùng")
+# def edit_user():
+#     messagebox.showinfo("Người dùng", "Sửa thông tin người dùng")
 
-def delete_user():
-    messagebox.showinfo("Người dùng", "Xóa người dùng")
+# def delete_user():
+#     messagebox.showinfo("Người dùng", "Xóa người dùng")
 
-def find_user():
-    messagebox.showinfo("Người dùng", "Tìm kiếm thông tin người dùng")
+# def find_user():
+#     messagebox.showinfo("Người dùng", "Tìm kiếm thông tin người dùng")
 
-def show_user():
-    messagebox.showinfo("Người dùng", "Hiển thị danh sách người dùng")
+# def show_user():
+#     messagebox.showinfo("Người dùng", "Hiển thị danh sách người dùng")

@@ -4,10 +4,10 @@ from datetime import datetime
 class Database:
     def __init__(self):
         self.conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="taolao",
-            database="Library"
+            user='root',
+            password='123456789',
+            host='localhost',
+            database='library'
         )
         self.cursor = self.conn.cursor()
 

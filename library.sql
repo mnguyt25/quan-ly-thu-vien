@@ -21,7 +21,9 @@ CREATE TABLE books (
 
 CREATE TABLE members (
     id SERIAL PRIMARY KEY,
-    ten_thanh_vien TEXT NOT NULL
+    ---ten_thanh_vien TEXT NOT NULL
+    ten_thanh_vien VARCHAR(100) NOT NULL,
+    FOREIGN KEY (ten_thanh_vien) REFERENCES users(username) ON DELETE CASCADE
 );
 
 CREATE TABLE borrowings (

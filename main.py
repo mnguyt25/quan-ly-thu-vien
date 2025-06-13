@@ -87,3 +87,7 @@ tk.Button(login_window, text="Đăng nhập", command=login).pack(pady=10)
 tk.Button(login_window, text="Đăng ký tài khoản", command=open_register_window).pack()
 
 login_window.mainloop()
+
+# Chạy chương trình
+if __name__ == "__main__":
+    open_admin_interface()
