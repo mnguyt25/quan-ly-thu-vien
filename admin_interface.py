@@ -50,36 +50,3 @@ def open_admin_interface():
     tk.Label(window, text="Quản lý thư viện", font=("Arial", 16)).pack(pady=20)
     
     window.mainloop()
-
-# # Demo
-# # Chức năng sách
-# def add_book():
-#     messagebox.showinfo("Quản lý sách", "Chức năng thêm sách")
-
-# def edit_book():
-#     messagebox.showinfo("Quản lý sách", "Chức năng sửa sách")
-
-# def delete_book():
-#     messagebox.showinfo("Quản lý sách", "Chức năng xóa sách")
-
-# def find_book():
-#     messagebox.showinfo("Quản lý sách", "Chức năng tìm sách")
-
-# def show_book():
-#     messagebox.showinfo("Quản lý sách", "Chức năng hiển thị sách")
-
-# # Chức năng người dùng
-# def add_user():
-#     messagebox.showinfo("Người dùng", "Thêm người dùng")
-
-# def edit_user():
-#     messagebox.showinfo("Người dùng", "Sửa thông tin người dùng")
-
-# def delete_user():
-#     messagebox.showinfo("Người dùng", "Xóa người dùng")
-
-# def find_user():
-#     messagebox.showinfo("Người dùng", "Tìm kiếm thông tin người dùng")
-
-# def show_user():
-#     messagebox.showinfo("Người dùng", "Hiển thị danh sách người dùng")
