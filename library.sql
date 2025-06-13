@@ -3,11 +3,11 @@ create database Library;
 CREATE TABLE users (
     username VARCHAR(50) PRIMARY KEY,
     password VARCHAR(100) NOT NULL,
-    role ENUM('admin', 'pulic') NOT NULL -- chỉ nhập một trong hai giá trị cố định
+    role ENUM('Admin', 'Public') NOT NULL -- chỉ nhập một trong hai giá trị cố định
 );
 
-INSERT TO users (username, password, role) 
-VALUE ("admin@", "admin@123", "admin");
+INSERT INTO users (username, password, role) 
+VALUE ("admin@", "admin@123", "Admin");
 
 CREATE TABLE books (
     id SERIAL PRIMARY KEY,
@@ -21,7 +21,7 @@ CREATE TABLE books (
 
 CREATE TABLE members (
     id SERIAL PRIMARY KEY,
-    ---ten_thanh_vien TEXT NOT NULL
+    -- ten_thanh_vien TEXT NOT NULL
     ten_thanh_vien VARCHAR(100) NOT NULL,
     FOREIGN KEY (ten_thanh_vien) REFERENCES users(username) ON DELETE CASCADE
 );
