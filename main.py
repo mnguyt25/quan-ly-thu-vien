@@ -1,11 +1,12 @@
 import tkinter as tk
+import mysql.connector
 from tkinter import messagebox
 from database import Database
 from admin_interface import open_admin_interface
 from user_interface import open_user_interface
 
 # ======= Kết nối CSDL MySQL =======
-db = Database()
+db = Database() 
 
 # ======= Hàm Đăng nhập =======
 def login():
