@@ -1,15 +1,13 @@
-import psycopg2
+import mysql.connector
 from datetime import datetime
-
 
 class Database:
     def __init__(self):
-        self.conn = psycopg2.connect(
-            database="project",
-            user="postgres",
-            password="2092005",
-            host="localhost",
-            port="5432",
+        self.conn = mysql.connector.connect(
+            user='root',
+            password='taolao',
+            host='localhost',
+            database='Library'
         )
         self.cursor = self.conn.cursor()
 
@@ -33,5 +31,3 @@ class Database:
         else:
             self.cursor.execute(query)
         return self.cursor.fetchone()
-    
-db = Database()
