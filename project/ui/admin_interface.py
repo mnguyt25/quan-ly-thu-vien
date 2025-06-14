@@ -1,0 +1,51 @@
+import tkinter as tk
+from models.books import add_book, edit_book, delete_book, find_book, show_book
+from models.users import add_user, edit_user, delete_user, find_user, show_user
+from models.borrowings import borrow_book, return_book, show_overdue_books
+
+# ======= Giao diện Quản trị viên =======
+def open_admin_interface():
+    window = tk.Tk()
+    window.title("Giao diện Quản trị viên")
+    window.geometry("400x300")
+    try:
+        window.iconbitmap("books_icon.ico")
+    except:
+        pass
+    
+    # === Menu Bar ===
+    menubar = tk.Menu(window)
+
+    # Quản lý sách
+    book_menu = tk.Menu(menubar, tearoff=0)
+    book_menu.add_command(label="Thêm sách", command=add_book)
+    book_menu.add_command(label="Sửa sách", command=edit_book)
+    book_menu.add_command(label="Xóa sách", command=delete_book)
+    book_menu.add_command(label="Tìm sách", command=find_book)
+    book_menu.add_command(label="Hiển thị sách", command=show_book)
+    menubar.add_cascade(label="Quản lý sách", menu=book_menu)
+
+    # Quản lý người dùng
+    user_menu = tk.Menu(menubar, tearoff=0)
+    user_menu.add_command(label="Thêm người dùng", command=lambda: add_user())
+    user_menu.add_command(label="Sửa thông tin người dùng", command=lambda: edit_user())
+    user_menu.add_command(label="Xóa người dùng", command=lambda: delete_user())
+    user_menu.add_command(label="Tìm kiếm thông tin người dùng", command=lambda: find_user())
+    user_menu.add_command(label="Hiển thị danh sách người dùng", command=lambda: show_user())
+    menubar.add_cascade(label="Quản lý người dùng", menu=user_menu)
+    
+    # Menu mượn trả sách
+    borrow_menu = tk.Menu(menubar, tearoff=0)
+    borrow_menu.add_command(label="Mượn sách", command=borrow_book)
+    borrow_menu.add_command(label="Trả sách", command=return_book)
+    borrow_menu.add_command(label="Sách quá hạn", command=show_overdue_books)
+    menubar.add_cascade(label="Mượn/Trả", menu=borrow_menu)
+
+    # Thoát
+    menubar.add_command(label="Thoát", command=window.destroy)
+
+    window.config(menu=menubar)
+
+    tk.Label(window, text="Quản lý thư viện", font=("Arial", 16)).pack(pady=20)
+    
+    window.mainloop()
