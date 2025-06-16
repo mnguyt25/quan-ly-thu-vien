@@ -1,172 +1,231 @@
 import tkinter as tk
-from tkinter import messagebox,  ttk, messagebox, simpledialog
-import mysql.connector
+from tkinter import ttk, messagebox, simpledialog
+import pyodbc
+from datetime import datetime, timedelta
 
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="taolao",
-    database="library_db"
-)
+# Kết nối cơ sở dữ liệu
+class Database:
+    def __init__(self):
+        self.server = 'localhost'
+        self.database = 'library'
+        self.username = 'tv'
+        self.password = '12345'
+        self.driver = '{ODBC Driver 17 for SQL Server}'
 
-cursor = conn.cursor()
-cursor.execute("SHOW TABLES;")  # ví dụ kiểm tra kết nối
-for x in cursor:
-    print(x)
+    def connect(self):
+        return pyodbc.connect(
+            f'DRIVER={self.driver};SERVER={self.server};DATABASE={self.database};UID={self.username};PWD={self.password}'
+        )
 
-conn.close()
+db = Database()
 
+# Lấy ID của user
+def get_user_id(username):
+    db = Database().connect()
+    cursor = db.cursor()
+    cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+    result = cursor.fetchone()
+    db.close()
+    return result[0] if result else None
 
-def get_db():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="taolao",
-        database="library"
-    )
-
-# ======= Giao diện Người dùng =======
-def open_user_interface (user_id):
+# Giao diện người dùng chính
+def open_user_interface(username):
     window = tk.Tk()
     window.title("Giao diện Người dùng")
-    window.geometry("400x300")
+    window.geometry("700x500")
     try:
         window.iconbitmap("books_icon.ico")
     except:
         pass
-    
-    # === Menu Bar ===
-    menubar = tk.Menu(window)
-    
-    menubar.add_command(label="Mượn sách", command=borrow)
-    
-    menubar.add_command(label="Trả sách", command=return_book)
-    
-    menubar.add_command(label="Thoát", command=window.destroy)
-    
-    window.config(menu=menubar)
-    
-    tk.Label(window, text="Thư viện", font=("Arial", 16)).pack(pady=20)
-    window.mainloop()
 
-#tabs
     notebook = ttk.Notebook(window)
-    notebook.pack(fill="both", expand=True)
+    notebook.pack(fill='both', expand=True)
 
-# Tab 1: Danh sách sách
-    tab_books = ttk.Frame(notebook)
-    notebook.add(tab_books, text="Danh sách sách")
-    tree_books = ttk.Treeview(tab_books, columns=("ID", "Tên sách", "Tác giả"), show="headings")
-    for col in ("ID", "Tên sách", "Tác giả"):
-        tree_books.heading(col, text=col)
-        tree_books.column(col, width=200)
-    tree_books.pack(fill="both", expand=True, padx=10, pady=10)
-    load_books(tree_books)
+    # === TABS ===
+    frame_sach = tk.Frame(notebook)
+    frame_muon = tk.Frame(notebook)
+    frame_ls = tk.Frame(notebook)
 
-# Tab 2 Tìm kiếm sách
-    tab_search = ttk.Frame(notebook)
-    notebook.add(tab_search, text="Tìm kiếm sách")
-    frame_search = ttk.Frame(tab_search)
-    frame_search.pack(pady=10)
-    tk.Label(frame_search, text="Từ khóa:").pack(side="left")
-    entry_search = tk.Entry(frame_search)
-    entry_search.pack(side="left", padx=5)
-    btn_search = tk.Button(frame_search, text="Tìm", command=lambda: search_books(entry_search.get(), tree_search))
-    btn_search.pack(side="left")
-    tree_search = ttk.Treeview(tab_search, columns=("ID", "Tên sách", "Tác giả"), show="headings")
-    for col in ("ID", "Tên sách", "Tác giả"):
-        tree_search.heading(col, text=col)
-        tree_search.column(col, width=200)
-    tree_search.pack(fill="both", expand=True, padx=10, pady=10)
+    notebook.add(frame_sach, text='📚 Danh sách sách')
+    notebook.add(frame_muon, text='📖 Mượn/Trả sách')
+    notebook.add(frame_ls, text='🕓 Lịch sử mượn')
 
- # Tab 3: Thông tin cá nhân
-    tab_profile = ttk.Frame(notebook)
-    notebook.add(tab_profile, text="Thông tin cá nhân")
-    label_profile = tk.Label(tab_profile, font=("Arial", 14), justify="left")
-    label_profile.pack(pady=20)
-    load_profile(user_id, label_profile)
-    
-# Tab 4: Lịch sử mượn
-    tab_history = ttk.Frame(notebook)
-    notebook.add(tab_history, text="Lịch sử mượn")
-    tree_history = ttk.Treeview(tab_history, columns=("Tên sách", "Ngày mượn", "Ngày trả"), show="headings")
-    for col in ("Tên sách", "Ngày mượn", "Ngày trả"):
-        tree_history.heading(col, text=col)
-        tree_history.column(col, width=200)
-    tree_history.pack(fill="both", expand=True, padx=10, pady=10)
-    load_history(user_id, tree_history)
+    # ===============================
+    # 1. TAB DANH SÁCH SÁCH + TÌM KIẾM
+    # ===============================
+    tk.Label(frame_sach, text="Tìm kiếm sách theo tên:").pack()
+    search_entry = tk.Entry(frame_sach)
+    search_entry.pack()
 
-    tk.Label(window, text="Thư viện", font=("Arial", 16)).pack(pady=5)
-    window.mainloop()
+    def load_books(keyword=""):
+        for i in tree_books.get_children():
+            tree_books.delete(i)
+
+        conn = db.connect()
+        cursor = conn.cursor()
+        if keyword:
+            cursor.execute("SELECT id, ten_sach, tac_gia, so_trang, nam_xuat_ban FROM books WHERE ten_sach LIKE ?", ('%' + keyword + '%',))
+        else:
+            cursor.execute("SELECT id, ten_sach, tac_gia, so_trang, nam_xuat_ban FROM books")
+        for row in cursor.fetchall():
+            tree_books.insert("", "end", values=row)
+        conn.close()
+
+    tk.Button(frame_sach, text="Tìm", command=lambda: load_books(search_entry.get())).pack()
+
+    columns = ("ID", "Tên sách", "Tác giả", "Số trang", "Năm xuất bản")
+    tree_books = ttk.Treeview(frame_sach, columns=columns, show="headings")
+
+    column_configs = [
+       ("ID", 50),
+       ("Tên sách", 200),
+       ("Tác giả", 150),
+       ("Số trang", 100),
+       ("Năm xuất bản", 120)
+     ]
+
+    for col, width in column_configs:
+     tree_books.heading(col, text=col)
+     tree_books.column(col, width=width, anchor="center")
+
+    tree_books.pack(fill="both", expand=True)
+
+    load_books()
+
+    # ===============================
+    # 2. MƯỢN & TRẢ SÁCH
+    # ===============================
+    def borrow_book():
+        print("Đang mượn sách với:", username)
+        book_id = simpledialog.askinteger("Mượn sách", "Nhập ID sách muốn mượn:")
+        if not book_id:
+            return
+
+        today = datetime.now().date()
+        try:
+            conn = db.connect()
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO borrow_records (book_id, username, borrow_date)
+                VALUES (?, ?, ?)
+            """, (book_id, username, today))
+            conn.commit()
+            conn.close()
+            messagebox.showinfo("Thành công", "Mượn sách thành công!")
+            load_borrow_history()
+        except Exception as e:
+            messagebox.showerror("Lỗi", str(e))
 
 
-def load_books(tree):
-    for row in tree.get_children():
-        tree.delete(row)
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT id, title, author FROM books")
-    for b in cursor.fetchall():
-        tree.insert("", "end", values=b)
-    db.close()
+    def return_book():
+        record_id = simpledialog.askinteger("Trả sách", "Nhập ID lịch sử mượn:")
+        if not record_id:
+            return
 
-def search_books(keyword, tree):
-    for row in tree.get_children():
-        tree.delete(row)
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT id, title, author FROM books WHERE title LIKE ? OR author LIKE ?", 
-                   (f"%{keyword}%", f"%{keyword}%"))
-    for b in cursor.fetchall():
-        tree.insert("", "end", values=b)
-    db.close()
+        today = datetime.now().date()
+        conn = db.connect()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE borrow_records SET return_date = ? WHERE id = ? AND username = ?", (today, record_id, username))
+        if cursor.rowcount == 0:
+            messagebox.showwarning("Không tìm thấy", "Không có bản ghi phù hợp.")
+        else:
+            conn.commit()
+            messagebox.showinfo("Thành công", "Trả sách thành công!")
+            load_borrow_history()
+        conn.close()
 
-def load_profile(user_id, label):
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT name, email FROM users WHERE id = ?", (user_id,))
-    user = cursor.fetchone()
-    if user:
-        label.config(text=f"Tên: {user[0]}\nEmail: {user[1]}")
-    else:
-        label.config(text="Không tìm thấy thông tin người dùng.")
-    db.close()
+    tk.Button(frame_muon, text="📥 Mượn sách", command=borrow_book).pack(pady=10)
+    tk.Button(frame_muon, text="📤 Trả sách", command=return_book).pack(pady=10)
 
-def load_history(user_id, tree):
-    for row in tree.get_children():
-        tree.delete(row)
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("""
-        SELECT b.title, br.borrow_date, br.return_date
+    # ===============================
+    # 3. LỊCH SỬ MƯỢN & GIA HẠN
+    # ===============================
+    tree_history = ttk.Treeview(frame_ls, columns=("ID", "Tên sách", "Ngày mượn", "Ngày trả"), show="headings")
+
+# Thiết lập tiêu đề và độ rộng cột
+    columns = [("ID", 50), ("Tên sách", 250), ("Ngày mượn", 120), ("Ngày trả", 120)]
+    for col, width in columns:
+     tree_history.heading(col, text=col)
+     tree_history.column(col, width=width, anchor="center")
+
+    tree_history.pack(fill="both", expand=True)
+
+
+    def load_borrow_history():
+     for i in tree_history.get_children():
+        tree_history.delete(i)
+
+     conn = db.connect()
+     cursor = conn.cursor()
+     cursor.execute("""
+        SELECT br.id, b.ten_sach, br.borrow_date, br.return_date
         FROM borrow_records br
         JOIN books b ON br.book_id = b.id
-        WHERE br.user_id = ?
-    """, (user_id,))
-    for r in cursor.fetchall():
-        tree.insert("", "end", values=(r[0], r[1], r[2] if r[2] else "Chưa trả"))
-    db.close()
-    
-# Demo
-def borrow():
-    messagebox.showinfo("Thông báo", "Chức năng mượn sách đang phát triển.")
+        WHERE br.username = ?
+    """, (username,))
 
-def return_book():
-    messagebox.showinfo("Thông báo", "Chức năng trả sách đang phát triển.")
+     for row in cursor.fetchall():
+        id_val, ten_sach, borrow_date, return_date = row
 
-# Hàm đăng nhập đơn giản để lấy user_id
-def login_and_open():
-    root = tk.Tk()
-    root.withdraw()
-    user_id = simpledialog.askinteger("Đăng nhập", "Nhập ID người dùng:")
-    if user_id:
-        root.destroy()
-        open_user_interface(user_id)
-    else:
-        messagebox.showinfo("Thông báo", "Bạn phải nhập ID để sử dụng.")
-        root.destroy()
+        # Chuyển định dạng ngày nếu không phải None
+        borrow_str = borrow_date.strftime("%d/%m/%Y") if borrow_date else ""
+        return_str = return_date.strftime("%d/%m/%Y") if return_date else ""
 
-if __name__ == "__main__":
-    login_and_open()
+        tree_history.insert("", "end", values=(id_val, ten_sach, borrow_str, return_str))
 
-print("File user_interface.py đã được load thành công")
+     conn.close()
+
+
+    def renew_book():
+        selected = tree_history.focus()
+        if not selected:
+          messagebox.showwarning("Chọn sách", "Vui lòng chọn dòng cần gia hạn.")
+          return
+
+        try:
+          renew_days = int(renew_days_entry.get())
+          if renew_days <= 0:
+            raise ValueError
+        except ValueError:
+           messagebox.showwarning("Lỗi", "Vui lòng nhập số ngày hợp lệ (lớn hơn 0).")
+           return
+
+        record_id = tree_history.item(selected)['values'][0]
+
+        conn = db.connect()
+        cursor = conn.cursor()
+
+    # Lấy ngày trả hiện tại
+        cursor.execute("SELECT return_date FROM borrow_records WHERE id = ?", (record_id,))
+        row = cursor.fetchone()
+        if not row or not row[0]:
+          messagebox.showerror("Lỗi", "Không tìm thấy ngày trả để gia hạn.")
+          conn.close()
+          return
+
+        
+        current_return_date = row[0]
+        new_return_date = current_return_date + timedelta(days=renew_days)
+
+    # Cập nhật ngày trả mới
+        cursor.execute("UPDATE borrow_records SET return_date = ? WHERE id = ?", 
+                   (new_return_date.strftime("%Y-%m-%d"), record_id))
+
+    # Ghi log gia hạn
+        cursor.execute("INSERT INTO renew_logs (borrow_id, note) VALUES (?, ?)", 
+                   (record_id, f"Gia hạn thêm {renew_days} ngày"))
+
+        conn.commit()
+        conn.close()
+
+        messagebox.showinfo("Thành công", f"Gia hạn thành công thêm {renew_days} ngày!")
+        load_borrow_history()
+
+
+    tk.Label(frame_ls, text="Số ngày muốn gia hạn:").pack()
+    renew_days_entry = tk.Entry(frame_ls)
+    renew_days_entry.pack()
+    tk.Button(frame_ls, text="🔁 Gia hạn sách", command=renew_book).pack(pady=10)
+    load_borrow_history()
+
+    window.mainloop()
