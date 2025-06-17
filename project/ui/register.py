@@ -1,9 +1,8 @@
 from customtkinter import *
-from database import Database
+from database import db
 from ui.messagebox import show_message
 
 def open_register_window():
-    db = Database()
     reg_win = CTkToplevel()
     reg_win.title("Đăng ký tài khoản")
     reg_win.geometry("360x360")
