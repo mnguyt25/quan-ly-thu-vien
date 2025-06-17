@@ -31,3 +31,6 @@ class Database:
         else:
             self.cursor.execute(query)
         return self.cursor.fetchone()
+
+
+db = Database()
