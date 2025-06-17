@@ -2,14 +2,13 @@ from customtkinter import *
 from PIL import Image # mở ảnh
 import sys, os # thêm thư mục cha vào sys.path để import được database
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from database import Database
+from database import db
 from ui.register import open_register_window
 from ui.messagebox import show_message
 from ui.admin_interface import open_admin_interface
 from ui.user_interface import open_user_interface
 
 def open_login_window():
-    db = Database()
     app = CTk() # custom window, tạo ra cửa sổ chính, tương tự như tk.Tk() trong tkinter
     app.title("Đăng nhập - Thế Giới Thơ Mộng") # tiêu đề
     app.iconbitmap("icon.ico") 
