@@ -5,8 +5,7 @@ from customtkinter import *
 from PIL import Image
 from tkinter import messagebox
 from CTkTable import CTkTable
-from models.books import add_book_to_store, delete_book_from_store, update_book_in_store, search_books_in_store, get_all_books
-
+from models.books import *
 def open_admin_interface():
     app = CTk()
     app.title("📚 Quản Lý Thư Viện")
